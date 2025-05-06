@@ -1,20 +1,37 @@
-create database aulaTransacao
-use aulaTransacao
+create database transacao
 
-create table contas (
-	idconta int primary key,
-	saldo decimal(10, 2)
+use transacao
+
+create table clientes (
+	clienteid int primary key,
+	nome varchar(100),
+	saldo decimal(10,2)
 );
 
-insert into contas (idconta, saldo) values (1, 1000.00);
-insert into contas (idconta, saldo) values (2, 500.00);
+insert into clientes(clienteid, nome, saldo)
+values(1, 'cliente A', 1000.00), (2, 'cliente B', 500.00);
 
-begin transaction
-update contas set saldo = saldo - 100 where idconta = 1;
-update contas set saldo = saldo + 100 where idconta = 2;
-
-rollback;
-
-commit;
-
-select * from contas
+create procedure transferirSaldoEntreClientes
+	@clienteOrigem int,
+	@clienteDestinado int,
+	@valorTransferencia decimal(10,2)
+as
+begin
+	begin transaction trasnferirSaldo;
+if ((select saldo from clientes where clienteid = @clienteOrigem >= @valorTransferencia)
+	begin
+	update clientes
+	set saldo = saldo - @valorTransferencia
+	where clienteid = @clienteOrigem;
+	update clientes
+	set saldo = saldo + @valorTransferencia
+	where clienteid = @clienteDestinado;
+	commit transaction transferirSaldo;
+	print 'transferência realizada com sucesso!'
+	end
+	else
+	begin
+	rollback transaction transferirSaldo;
+	print 'saldo insuficiente para realizar a transferência'
+	end
+end;
