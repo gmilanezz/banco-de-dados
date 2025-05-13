@@ -30,13 +30,15 @@ if ((select estoque from produtos where idproduto = estoque >= @unidadesVendidas
 	set @saldoUnidades = estoque + @unidadesVendidas
 	where idproduto = @unidadesPosVenda
 	commit transaction atualizarEstoque;
-	print 'atualizaÁ„o feita com sucesso!'
+	print 'atualiza√ß√£o feita com sucesso!'
 	end
 	else
 	begin
 	rollback transaction atualizarEstoque;
-	print 'estoque n„o disponÌvel para atualizaÁ„o'
+	print 'estoque n√£o dispon√≠vel para atualiza√ß√£o'
 	end;
 end;          
 
+exec atualizarEstoque where idproduto = 1
+exec atualizarEstoque where idproduto = 2
 select * from produtos
